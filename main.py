@@ -30,3 +30,25 @@ JUMPING = pygame.image.load(os.path.join('assets/hiker', 'hiker-jump.png'))
 # BACKGROUND = pygame.image.load(os.path.join('assets/background', 'track.png'))
 
 
+def main():
+  run = True
+  clock = pygame.time.Clock()
+  player = Hiker()
+
+  while run:
+    for event in pygame.event.get():
+      if event.type == pygame.QUIT:
+        run = False
+
+    SCREEN.fill((255, 255, 255))
+    userInput = pygame.key.get_pressed()
+
+    player.draw(SCREEN) # draws hiker on the screen
+    player.update(userInput) # updates the hiker on every while loop iteration
+
+    clock.tick(30)
+    pygame.display.update()
+
+
+
+main()
