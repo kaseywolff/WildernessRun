@@ -9,8 +9,11 @@ SCREEN_WIDTH = 1100
 SCREEN = pygame.display.set_mode((SCREEN_WIDTH, SCREEN_HEIGHT)) # defines display where game will be shown
 
 # LOAD IN IMAGES - HIKER
-RUNNING = [pygame.image.load(os.path.join('assets/hiker', 'hiker-run1.png')), 
-           pygame.image.load(os.path.join('assets/hiker', 'hiker-run2.png'))]
+RUNNING = [
+            pygame.image.load(os.path.join('assets/hiker', 'hiker-run3.png')),
+            pygame.image.load(os.path.join('assets/hiker', 'hiker-run2.png')),
+            pygame.image.load(os.path.join('assets/hiker', 'hiker-run1.png'))
+          ]
 JUMPING = pygame.image.load(os.path.join('assets/hiker', 'hiker-jump.png'))
 # DUCKING = [pygame.image.load(os.path.join('assets/hiker', 'hiker-duck1.png')), 
 #            pygame.image.load(os.path.join('assets/hiker', 'hiker-duck2.png'))]
@@ -83,7 +86,7 @@ class Hiker:
 
   # run animation
   def run(self):
-    self.image = self.run_img[self.step_index // 5]
+    self.image = self.run_img[self.step_index // 2 % len(self.run_img)]
     self.hiker_rect = self.image.get_rect()
     self.hiker_rect.x = self.X_POS
     self.hiker_rect.y = self.Y_POS
