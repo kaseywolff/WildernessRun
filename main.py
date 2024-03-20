@@ -1,5 +1,6 @@
 import pygame
 import os
+import random
 
 pygame.init()
 
@@ -15,8 +16,10 @@ RUNNING = [
             pygame.image.load(os.path.join('assets/hiker', 'hiker-run1.png'))
           ]
 JUMPING = pygame.image.load(os.path.join('assets/hiker', 'hiker-jump.png'))
-# DUCKING = [pygame.image.load(os.path.join('assets/hiker', 'hiker-duck1.png')), 
-#            pygame.image.load(os.path.join('assets/hiker', 'hiker-duck2.png'))]
+DUCKING = [
+            pygame.image.load(os.path.join('assets/hiker', 'hiker-duck1.png')), 
+            pygame.image.load(os.path.join('assets/hiker', 'hiker-duck2.png'))
+          ]
 
 # # LOAD IN IMAGES - OBSTACLES
 # SMALL_OBSTACLE = [pygame.image.load(os.path.join('assets/obstacles', 'campfire-small.png')),
@@ -37,9 +40,11 @@ class Hiker:
   # position of hiker - remains stationary throughout game
   X_POS = 80
   Y_POS = 310
+  Y_POS_DUCK = 310
+  JUMP_VELOCITY = 8.5
 
   def __init__(self):
-    # self.duck_img = DUCKING
+    self.duck_img = DUCKING
     self.run_img = RUNNING
     self.jump_img = JUMPING
 
@@ -48,6 +53,7 @@ class Hiker:
     self.hiker_jump = False
 
     self.step_index = 0
+    self.jump_velocity = self.JUMP_VELOCITY
     self.image = self.run_img[0]
     # hit box
     self.hiker_rect = self.image.get_rect()
@@ -82,7 +88,11 @@ class Hiker:
       self.hiker_jump = False
 
   def duck(self):
-    pass
+    self.image = self.duck_img[self.step_index // 2 % len(self.duck_img)]
+    self.hiker_rect = self.image.get_rect()
+    self.hiker_rect.x = self.X_POS
+    self.hiker_rect.y = self.Y_POS_DUCK
+    self.step_index += 1
 
   # run animation
   def run(self):
@@ -93,7 +103,14 @@ class Hiker:
     self.step_index += 1
 
   def jump(self):
-    pass
+    self.image = self.jump_img
+    if self.hiker_jump:
+      self.hiker_rect.y -= self.jump_velocity * 4 ## decrease y position of hiker (top left corner is (0,0))
+      self.jump_velocity -= 0.8
+    
+    if self.jump_velocity < - self.JUMP_VELOCITY:
+      self.hiker_jump = False
+      self.jump_velocity = self.JUMP_VELOCITY
 
   def draw(self, SCREEN):
     SCREEN.blit(self.image, (self.hiker_rect.x, self.hiker_rect.y))
