@@ -21,7 +21,7 @@ DUCKING = [
             pygame.image.load(os.path.join('assets/hiker', 'hiker_duck2.png'))
           ]
 
-# # LOAD IN IMAGES - OBSTACLES
+# LOAD IN IMAGES - OBSTACLES
 SMALL_CACTUS = [
                 pygame.image.load(os.path.join('assets/obstacles', 'cactus_small1.png')),
                 pygame.image.load(os.path.join('assets/obstacles', 'cactus_small2.png'))
@@ -30,9 +30,10 @@ SMALL_CAMPFIRE = [
                   pygame.image.load(os.path.join('assets/obstacles', 'campfire_small1.png')),
                   pygame.image.load(os.path.join('assets/obstacles', 'campfire_small2.png'))
                 ]
-# LARGE_OBSTACLE = [pygame.image.load(os.path.join('assets/obstacles', 'campfire-large.png')),
-#                   pygame.image.load(os.path.join('assets/obstacles', 'cactus-large.png')),
-#                   pygame.image.load(os.path.join('assets/obstacles', 'snake-large.png'))]
+SNAKE = [
+          pygame.image.load(os.path.join('assets/obstacles', 'snake1.png')),
+          pygame.image.load(os.path.join('assets/obstacles', 'snake2.png'))
+        ]
 # BIRD = [pygame.image.load(os.path.join('assets/bird', 'bird1.png')),
 #         pygame.image.load(os.path.join('assets/bird', 'bird2.png'))]
 
@@ -182,6 +183,21 @@ class SmallCampfire(Obstacle):
     SCREEN.blit(self.image[self.index // 5], self.rect)
     self.index += 1
 
+class Snake(Obstacle):
+  def __init__(self, image):
+    self.type = 0
+    super().__init__(image, self.type)
+    self.rect.y = 367
+    self.index = 0 # used for animation
+  
+  def draw(self, SCREEN):
+    if self.index >= 40:
+      self.index = 0
+    frame_index = self.index // 5
+    frame_index %= len(self.image)  # ensure index stays within the range of the image list
+    SCREEN.blit(self.image[frame_index], self.rect)
+    self.index += 1
+
 
 def main():
   global game_speed, x_pos_background, y_pos_background, points, obstacles
@@ -239,10 +255,10 @@ def main():
         obstacles.append(SmallCampfire(SMALL_CAMPFIRE)) 
       elif random.randint(0, 3) == 2:
         # obstacles.append(Bird(BIRD))
-        obstacles.append(SmallCampfire(SMALL_CAMPFIRE)) # remove when bird made
+        obstacles.append(Snake(SNAKE)) 
       elif random.randint(0, 3) == 3:
         # obstacles.append(LargeObstacle(LARGE_OBSTACLE))
-        obstacles.append(SmallCampfire(SMALL_CAMPFIRE)) # remove when bird made
+        obstacles.append(Snake(SNAKE)) 
 
     
     for obstacle in obstacles:
