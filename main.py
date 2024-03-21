@@ -22,9 +22,13 @@ DUCKING = [
           ]
 
 # # LOAD IN IMAGES - OBSTACLES
-# SMALL_OBSTACLE = [pygame.image.load(os.path.join('assets/obstacles', 'campfire-small.png')),
-#                   pygame.image.load(os.path.join('assets/obstacles', 'cactus-small.png')),
-#                   pygame.image.load(os.path.join('assets/obstacles', 'snake-small.png'))]
+SMALL_CACTUS = [
+                pygame.image.load(os.path.join('assets/obstacles', 'cactus_small1.png'))
+              ]
+SMALL_CAMPFIRE = [
+                  pygame.image.load(os.path.join('assets/obstacles', 'campfire_small1.png')),
+                  pygame.image.load(os.path.join('assets/obstacles', 'campfire_small2.png'))
+                ]
 # LARGE_OBSTACLE = [pygame.image.load(os.path.join('assets/obstacles', 'campfire-large.png')),
 #                   pygame.image.load(os.path.join('assets/obstacles', 'cactus-large.png')),
 #                   pygame.image.load(os.path.join('assets/obstacles', 'snake-large.png'))]
@@ -88,7 +92,7 @@ class Hiker:
       self.hiker_jump = False
 
   def duck(self):
-    self.image = self.duck_img[self.step_index // 2 % len(self.duck_img)]
+    self.image = self.duck_img[self.step_index // 4 % len(self.duck_img)]
     self.hiker_rect = self.image.get_rect()
     self.hiker_rect.x = self.X_POS
     self.hiker_rect.y = self.Y_POS_DUCK
@@ -96,7 +100,7 @@ class Hiker:
 
   # run animation
   def run(self):
-    self.image = self.run_img[self.step_index // 2 % len(self.run_img)]
+    self.image = self.run_img[self.step_index // 4 % len(self.run_img)]
     self.hiker_rect = self.image.get_rect()
     self.hiker_rect.x = self.X_POS
     self.hiker_rect.y = self.Y_POS
@@ -116,6 +120,7 @@ class Hiker:
     SCREEN.blit(self.image, (self.hiker_rect.x, self.hiker_rect.y))
 
 
+# BACKGROUND CLASSES (cloud)
 class Cloud:
   def __init__(self):
     self.x = SCREEN_WIDTH + random.randint(800, 1000)
@@ -137,9 +142,48 @@ class Cloud:
     SCREEN.blit(self.image, (self.x, self.y))
 
 
+# OBSTACLE CLASSES (campfire, cactus, snake)
+class Obstacle:
+  def __init__(self, image, type):
+    self.image = image
+    # gets type of obstacle (campfire, cactus, snake)
+    self.type = type
+    self.rect = self.image[self.type].get_rect()
+    # image is just off the edge of the screen
+    self.rect.x = SCREEN_WIDTH
+
+  def update(self):
+    self.rect.x -= game_speed
+    if self.rect.x < -self.rect.width:
+      obstacles.pop()
+  
+  def draw(self, SCREEN):
+    SCREEN.blit(self.image[self.type], self.rect)
+
+
+class SmallCactus(Obstacle):
+  def __init__(self, image):
+    self.type = 0 # change to 'random.randint(0, 1)' once second cactus is made
+    super().__init__(image, self.type)
+    self.rect.y = 345
+
+
+class SmallCampfire(Obstacle):
+  def __init__(self, image):
+    self.type = 0
+    super().__init__(image, self.type)
+    self.rect.y = 345
+    self.index = 0 # used for animation
+  
+  def draw(self, SCREEN):
+    if self.index >= 9:
+      self.index = 0
+    SCREEN.blit(self.image[self.index // 5], self.rect)
+    self.index += 1
+
 
 def main():
-  global game_speed, x_pos_background, y_pos_background, points
+  global game_speed, x_pos_background, y_pos_background, points, obstacles
   run = True
   clock = pygame.time.Clock()
   player = Hiker()
@@ -149,6 +193,7 @@ def main():
   y_pos_background = 410
   points = 0
   font = pygame.font.Font('freesansbold.ttf', 20)
+  obstacles = []
 
   def score():
     global points, game_speed
@@ -183,8 +228,28 @@ def main():
 
     SCREEN.fill((255, 255, 255))
     userInput = pygame.key.get_pressed()
-    
+
     background()
+
+    if len(obstacles) == 0:
+      if random.randint(0, 3) == 0:
+        obstacles.append(SmallCactus(SMALL_CACTUS))
+      elif random.randint(0, 3) == 1:
+        obstacles.append(SmallCampfire(SMALL_CAMPFIRE)) 
+      elif random.randint(0, 3) == 2:
+        # obstacles.append(Bird(BIRD))
+        obstacles.append(SmallCampfire(SMALL_CAMPFIRE)) # remove when bird made
+      elif random.randint(0, 3) == 3:
+        # obstacles.append(LargeObstacle(LARGE_OBSTACLE))
+        obstacles.append(SmallCampfire(SMALL_CAMPFIRE)) # remove when bird made
+
+    
+    for obstacle in obstacles:
+      obstacle.draw(SCREEN)
+      obstacle.update()
+      if player.hiker_rect.colliderect(obstacle.rect):
+        pygame.draw.rect(SCREEN, (255, 0, 0), player.hiker_rect)
+    
 
     cloud.draw(SCREEN)
     cloud.update(game_speed)
