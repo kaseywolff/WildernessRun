@@ -139,7 +139,7 @@ class Cloud:
 
 
 def main():
-  global game_speed, x_pos_background, y_pos_background
+  global game_speed, x_pos_background, y_pos_background, points
   run = True
   clock = pygame.time.Clock()
   player = Hiker()
@@ -147,6 +147,20 @@ def main():
   game_speed = 14
   x_pos_background = 0
   y_pos_background = 410
+  points = 0
+  font = pygame.font.Font('freesansbold.ttf', 20)
+
+  def score():
+    global points, game_speed
+    points += 1
+    # game becomes increasingly fast the longer you stay alive
+    if points % 100 == 0:
+      game_speed += 1
+    
+    text = font.render('Points: ' + str(points), True, (0, 0, 0))
+    text_rect = text.get_rect()
+    text_rect.center = (1000, 40)
+    SCREEN.blit(text, text_rect)
 
 
   def background():
@@ -174,6 +188,8 @@ def main():
 
     cloud.draw(SCREEN)
     cloud.update(game_speed)
+
+    score()
 
     player.draw(SCREEN) # draws hiker on the screen
     player.update(userInput) # updates the hiker on every while loop iteration
