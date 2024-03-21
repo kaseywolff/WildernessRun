@@ -11,14 +11,14 @@ SCREEN = pygame.display.set_mode((SCREEN_WIDTH, SCREEN_HEIGHT)) # defines displa
 
 # LOAD IN IMAGES - HIKER
 RUNNING = [
-            pygame.image.load(os.path.join('assets/hiker', 'hiker-run3.png')),
-            pygame.image.load(os.path.join('assets/hiker', 'hiker-run2.png')),
-            pygame.image.load(os.path.join('assets/hiker', 'hiker-run1.png'))
+            pygame.image.load(os.path.join('assets/hiker', 'hiker_run3.png')),
+            pygame.image.load(os.path.join('assets/hiker', 'hiker_run2.png')),
+            pygame.image.load(os.path.join('assets/hiker', 'hiker_run1.png'))
           ]
-JUMPING = pygame.image.load(os.path.join('assets/hiker', 'hiker-jump.png'))
+JUMPING = pygame.image.load(os.path.join('assets/hiker', 'hiker_jump.png'))
 DUCKING = [
-            pygame.image.load(os.path.join('assets/hiker', 'hiker-duck1.png')), 
-            pygame.image.load(os.path.join('assets/hiker', 'hiker-duck2.png'))
+            pygame.image.load(os.path.join('assets/hiker', 'hiker_duck1.png')), 
+            pygame.image.load(os.path.join('assets/hiker', 'hiker_duck2.png'))
           ]
 
 # # LOAD IN IMAGES - OBSTACLES
@@ -32,15 +32,15 @@ DUCKING = [
 #         pygame.image.load(os.path.join('assets/bird', 'bird2.png'))]
 
 # # BACKGROUND
-# CLOUD = pygame.image.load(os.path.join('assets/background', 'cloud.png'))
-# BACKGROUND = pygame.image.load(os.path.join('assets/background', 'track.png'))
+CLOUD = pygame.image.load(os.path.join('assets/background', 'cloud.png'))
+BACKGROUND = pygame.image.load(os.path.join('assets/background', 'ground.png'))
 
 
 class Hiker:
   # position of hiker - remains stationary throughout game
   X_POS = 80
-  Y_POS = 310
-  Y_POS_DUCK = 310
+  Y_POS = 330
+  Y_POS_DUCK = 356
   JUMP_VELOCITY = 8.5
 
   def __init__(self):
@@ -108,7 +108,7 @@ class Hiker:
       self.hiker_rect.y -= self.jump_velocity * 4 ## decrease y position of hiker (top left corner is (0,0))
       self.jump_velocity -= 0.8
     
-    if self.jump_velocity < - self.JUMP_VELOCITY:
+    if self.jump_velocity < -self.JUMP_VELOCITY:
       self.hiker_jump = False
       self.jump_velocity = self.JUMP_VELOCITY
 
@@ -116,10 +116,51 @@ class Hiker:
     SCREEN.blit(self.image, (self.hiker_rect.x, self.hiker_rect.y))
 
 
+class Cloud:
+  def __init__(self):
+    self.x = SCREEN_WIDTH + random.randint(800, 1000)
+    self.y = random.randint(50, 100)
+    self.image = CLOUD
+    self.width = self.image.get_width()
+
+  # move cloud from right of screen to left
+  def update(self, game_speed):
+    self.x -= game_speed
+
+    # reset cloud when it moves off screen
+    if self.x < -self.width:
+      self.x = SCREEN_WIDTH + random.randint(2500, 3000)
+      self.y = random.randint(50, 100)
+  
+
+  def draw(self, SCREEN):
+    SCREEN.blit(self.image, (self.x, self.y))
+
+
+
 def main():
+  global game_speed, x_pos_background, y_pos_background
   run = True
   clock = pygame.time.Clock()
   player = Hiker()
+  cloud = Cloud()
+  game_speed = 14
+  x_pos_background = 0
+  y_pos_background = 410
+
+
+  def background():
+    global x_pos_background, y_pos_background
+    image_width = BACKGROUND.get_width()
+    SCREEN.blit(BACKGROUND, (x_pos_background, y_pos_background))
+    # second background image
+    SCREEN.blit(BACKGROUND, (image_width + x_pos_background, y_pos_background))
+    # when first background image moves off the screen, add second image
+    if x_pos_background <= -image_width:
+      SCREEN.blit(BACKGROUND, (image_width + x_pos_background, y_pos_background))
+      x_pos_background = 0
+    # subtract game speed from position of background so it moves
+    x_pos_background -= game_speed
 
   while run:
     for event in pygame.event.get():
@@ -128,9 +169,15 @@ def main():
 
     SCREEN.fill((255, 255, 255))
     userInput = pygame.key.get_pressed()
+    
+    background()
+
+    cloud.draw(SCREEN)
+    cloud.update(game_speed)
 
     player.draw(SCREEN) # draws hiker on the screen
     player.update(userInput) # updates the hiker on every while loop iteration
+
 
     clock.tick(30)
     pygame.display.update()
