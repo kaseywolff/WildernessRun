@@ -23,7 +23,8 @@ DUCKING = [
 
 # # LOAD IN IMAGES - OBSTACLES
 SMALL_CACTUS = [
-                pygame.image.load(os.path.join('assets/obstacles', 'cactus_small1.png'))
+                pygame.image.load(os.path.join('assets/obstacles', 'cactus_small1.png')),
+                pygame.image.load(os.path.join('assets/obstacles', 'cactus_small2.png'))
               ]
 SMALL_CAMPFIRE = [
                   pygame.image.load(os.path.join('assets/obstacles', 'campfire_small1.png')),
@@ -163,7 +164,7 @@ class Obstacle:
 
 class SmallCactus(Obstacle):
   def __init__(self, image):
-    self.type = 0 # change to 'random.randint(0, 1)' once second cactus is made
+    self.type = random.randint(0, 1)
     super().__init__(image, self.type)
     self.rect.y = 345
 
