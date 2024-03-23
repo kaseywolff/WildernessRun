@@ -39,7 +39,8 @@ SNAKE = [
 
 # # BACKGROUND
 CLOUD = pygame.image.load(os.path.join('assets/background', 'cloud.png'))
-BACKGROUND = pygame.image.load(os.path.join('assets/background', 'ground.png'))
+BACKGROUND_MOUNTAINS = pygame.image.load(os.path.join('assets/background', 'mountains.png'))
+BACKGROUND_GROUND = pygame.image.load(os.path.join('assets/background', 'ground.png'))
 
 
 class Hiker:
@@ -169,7 +170,6 @@ class SmallCactus(Obstacle):
     super().__init__(image, self.type)
     self.rect.y = 345
 
-
 class SmallCampfire(Obstacle):
   def __init__(self, image):
     self.type = 0
@@ -200,14 +200,16 @@ class Snake(Obstacle):
 
 
 def main():
-  global game_speed, x_pos_background, y_pos_background, points, obstacles
+  global game_speed, x_pos_background_mountains, y_pos_background_mountains, x_pos_background_ground, y_pos_background_ground, points, obstacles
   run = True
   clock = pygame.time.Clock()
   player = Hiker()
   cloud = Cloud()
   game_speed = 14
-  x_pos_background = 0
-  y_pos_background = 410
+  x_pos_background_mountains = 0
+  y_pos_background_mountains = 220
+  x_pos_background_ground = 0
+  y_pos_background_ground = 410
   points = 0
   font = pygame.font.Font('freesansbold.ttf', 20)
   obstacles = []
@@ -225,18 +227,32 @@ def main():
     SCREEN.blit(text, text_rect)
 
 
-  def background():
-    global x_pos_background, y_pos_background
-    image_width = BACKGROUND.get_width()
-    SCREEN.blit(BACKGROUND, (x_pos_background, y_pos_background))
-    # second background image
-    SCREEN.blit(BACKGROUND, (image_width + x_pos_background, y_pos_background))
-    # when first background image moves off the screen, add second image
-    if x_pos_background <= -image_width:
-      SCREEN.blit(BACKGROUND, (image_width + x_pos_background, y_pos_background))
-      x_pos_background = 0
-    # subtract game speed from position of background so it moves
-    x_pos_background -= game_speed
+  def background_mountains():
+    global x_pos_background_mountains, y_pos_background_mountains
+    image_width = BACKGROUND_MOUNTAINS.get_width()
+    SCREEN.blit(BACKGROUND_MOUNTAINS, (x_pos_background_mountains, y_pos_background_mountains))
+    # second background_mountains image
+    SCREEN.blit(BACKGROUND_MOUNTAINS, (image_width + x_pos_background_mountains, y_pos_background_mountains))
+    # when first background_mountains image moves off the screen, add second image
+    if x_pos_background_mountains <= -image_width:
+      SCREEN.blit(BACKGROUND_MOUNTAINS, (image_width + x_pos_background_mountains, y_pos_background_mountains))
+      x_pos_background_mountains = 0
+    # subtract game speed from position of background_mountains so it moves
+    x_pos_background_mountains -= game_speed / 8
+  
+  
+  def background_ground():
+    global x_pos_background_ground, y_pos_background_ground
+    image_width = BACKGROUND_GROUND.get_width()
+    SCREEN.blit(BACKGROUND_GROUND, (x_pos_background_ground, y_pos_background_ground))
+    # second background_ground image
+    SCREEN.blit(BACKGROUND_GROUND, (image_width + x_pos_background_ground, y_pos_background_ground))
+    # when first background_ground image moves off the screen, add second image
+    if x_pos_background_ground <= -image_width:
+      SCREEN.blit(BACKGROUND_GROUND, (image_width + x_pos_background_ground, y_pos_background_ground))
+      x_pos_background_ground = 0
+    # subtract game speed from position of background_ground so it moves
+    x_pos_background_ground -= game_speed
 
   while run:
     for event in pygame.event.get():
@@ -246,7 +262,8 @@ def main():
     SCREEN.fill((255, 255, 255))
     userInput = pygame.key.get_pressed()
 
-    background()
+    background_mountains()
+    background_ground()
 
     if len(obstacles) == 0:
       if random.randint(0, 3) == 0:
